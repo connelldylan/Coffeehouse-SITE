@@ -1,0 +1,232 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coffeehouse</title>
+  <link rel="icon" type="image/jpg" href="Coffeehouse_favicon.png">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    function toggleNav() {
+    var sidebar = document.getElementById("mySidebar");
+    var openbtn = document.querySelector(".openbtn");
+
+    if (sidebar.style.width === "0px" || sidebar.style.width === "") {
+      sidebar.style.width = "95%";
+      openbtn.innerHTML = "&#10005;"; // Change to X icon
+    } else {
+      sidebar.style.width = "0";
+      openbtn.innerHTML = "&#9776;"; // Change back to hamburger icon
+    }
+  }
+  </script>
+</head>
+<body>
+    <!--------------------------Header---------------------->
+    <div class="tab">
+        <div class="content">
+          <img src="Coffeehouse_Logo.jpg" alt="Image" class="LogoImage">
+        </div>
+        <div class="buttons">
+          <a href="mailto:info@coffeehouse.vote" class="button">Contact</a>
+        </div>
+        <div class="buttons">
+            <a href="ballot_tool.html" class="button">Ballot Tool</a>
+          </div>
+        <div class="buttons">
+            <a href="index.html" class="button">Home</a>
+        </div>
+        <div id="mySidebar" class="sidebar">
+            <a href="mailto:info@coffeehouse.vote" class="linkButton">Contact</a>
+            <a href="ballot_tool.html" class="linkButton">Ballot Tool</a>
+            <a href="index.html" class="linkButton">Home</a>
+        </div>
+          
+          <div class="HamContent">
+            <span class="openbtn" onclick="toggleNav()">&#9776;</span>
+          </div>
+    </div>
+
+    <h2 style="margin-top: 50px">Voter Information Tool</h2>
+    <form id="addressForm">
+        <input type="text" id="address" placeholder="Enter your address" required>
+        <button type="submit">See my Ballot Information</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('addressForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const address = document.getElementById('address').value;
+            const apiKey = 'AIzaSyDNBBxYEOs18N8TzAQkw6TV1ThO7s9ZYJY';
+            const url = `https://www.googleapis.com/civicinfo/v2/voterinfo?key=${apiKey}&address=${encodeURIComponent(address)}`;
+    
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // For debugging
+                    displayResults(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('results').innerHTML = 'Failed to retrieve data. Please try again.';
+                });
+        });
+    
+        function displayResults(data) {
+    const resultsContainer = document.getElementById('results');
+    resultsContainer.innerHTML = ''; // Clear previous results
+
+    // Display Election Information
+    if (data && data.election) {
+        const electionInfo = document.createElement('div');
+        electionInfo.innerHTML = `<h3>Election: ${data.election.name}</h3><p>Date: ${data.election.electionDay}</p>`;
+        resultsContainer.appendChild(electionInfo);
+    } else {
+        displayNoDataMessage('Election Information', resultsContainer);
+    }
+
+    // Display Candidates
+    if (data && data.contests && data.contests.some(contest => contest.type !== 'referendum')) {
+        displayCandidates(data.contests, resultsContainer);
+    } else {
+        displayNoDataMessage('Candidates', resultsContainer);
+    }
+
+    // Display Polling Locations
+    if (data && data.pollingLocations) {
+        displayLocationData('Polling Locations', data.pollingLocations, resultsContainer);
+    } else {
+        displayNoDataMessage('Polling Locations', resultsContainer);
+    }
+
+    if (data.earlyVoteSites) {
+        displayLocationData('Early Vote Sites', data.earlyVoteSites, resultsContainer);
+    } else {
+        displayNoDataMessage('Early Vote Sites', resultsContainer);
+    }
+
+    if (data.dropOffLocations) {
+        displayLocationData('Drop-Off Locations', data.dropOffLocations, resultsContainer);
+    } else {
+        displayNoDataMessage('Drop-Off Locations', resultsContainer);
+    }
+
+    // Display Referendum Questions
+    if (data && data.contests && data.contests.some(contest => contest.type === 'referendum')) {
+        displayReferendums(data.contests, resultsContainer);
+    } else {
+        displayNoDataMessage('Referendum Questions', resultsContainer);
+    }
+}
+
+function displayCandidates(contests, container) {
+    const candidatesHeader = document.createElement('h3');
+    candidatesHeader.textContent = 'Candidates:';
+    container.appendChild(candidatesHeader);
+
+    contests.forEach(contest => {
+        if (contest.type !== 'referendum') {
+            const contestBox = document.createElement('div'); // Create a box for each contest
+            contestBox.className = 'section-box'; // Apply box styling
+
+            const contestTitle = document.createElement('strong');
+            contestTitle.innerHTML = `${contest.office} (${contest.type})`;
+            contestBox.appendChild(contestTitle);
+
+            if (contest.candidates) {
+                const candidatesList = document.createElement('ul');
+                contest.candidates.forEach(candidate => {
+                    const candidateItem = document.createElement('li');
+                    let partyClass = candidate.party ? candidate.party.toLowerCase().replace(/\s+/g, '-') : 'non-partisan';
+                    let partyText = candidate.party || 'Non-Partisan';
+                    candidateItem.innerHTML = `${candidate.name} <span class="party-label ${partyClass}">${partyText}</span>`;
+                    candidatesList.appendChild(candidateItem);
+                });
+                contestBox.appendChild(candidatesList); // Add candidates list to the box
+            }
+
+            container.appendChild(contestBox); // Add the contest box to the container
+        }
+    });
+}
+
+function displayReferendums(contests, container) {
+    const referendumsHeader = document.createElement('h3');
+    referendumsHeader.textContent = 'Prepare for the questions being asked:';
+    container.appendChild(referendumsHeader);
+
+    const referendumsList = document.createElement('ul');
+    referendumsList.className = 'referendumsList'; // Ensures consistent styling
+
+    contests.filter(contest => contest.type === 'referendum').forEach(referendum => {
+        const referendumBox = document.createElement('div'); // Box for each referendum question
+        referendumBox.className = 'section-box'; // Apply box styling
+
+        const title = document.createElement('div');
+        title.innerHTML = `<strong>${referendum.referendumTitle}</strong>`;
+        title.style.marginBottom = "10px"; // Spacing below the title
+        referendumBox.appendChild(title);
+
+        const text = document.createElement('div');
+        text.textContent = referendum.referendumText;
+        referendumBox.appendChild(text);
+
+        referendumsList.appendChild(referendumBox);
+    });
+
+    container.appendChild(referendumsList);
+}
+
+function displayLocationData(sectionName, locations, container) {
+    const sectionHeader = document.createElement('h3');
+    sectionHeader.textContent = sectionName;
+    container.appendChild(sectionHeader);
+
+    if (locations && locations.length > 0) {
+        const locationsList = document.createElement('ul');
+        locationsList.className = 'locationsList'; // Ensures consistent styling
+
+        locations.forEach(location => {
+            const locationBox = document.createElement('div'); // Box for each location
+            locationBox.className = 'section-box'; // Apply box styling
+
+            const locationName = document.createElement('div');
+            locationName.textContent = location.address.locationName;
+            locationName.style.marginBottom = "10px"; // Spacing below the location name
+            locationBox.appendChild(locationName);
+
+            const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${location.address.line1}, ${location.address.city}, ${location.address.state} ${location.address.zip}`)}`;
+
+            const locationAddress = document.createElement('a');
+            locationAddress.href = mapsSearchUrl;
+            locationAddress.target = "_blank";
+            locationAddress.textContent = `${location.address.line1}, ${location.address.city}, ${location.address.state} ${location.address.zip}`;
+            locationAddress.style.color = "#AB824E"; // Link color
+            locationAddress.style.display = "block"; // Ensures margin applies correctly
+            locationAddress.style.marginBottom = "10px"; // Spacing below the address
+            locationBox.appendChild(locationAddress);
+
+            if (location.pollingHours) {
+                const hours = document.createElement('div');
+                hours.innerHTML = `<strong>Hours:</strong> ${location.pollingHours}`;
+                locationBox.appendChild(hours);
+            }
+
+            locationsList.appendChild(locationBox);
+        });
+
+        container.appendChild(locationsList);
+    } else {
+        displayNoDataMessage(sectionName, container);
+    }
+}
+
+function displayNoDataMessage(sectionName, container) {
+    const noDataMessage = document.createElement('p');
+    noDataMessage.textContent = `There is no data for ${sectionName} yet.`;
+    container.appendChild(noDataMessage);
+}
+    </script>
+</body>
+</html>

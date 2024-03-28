@@ -28,7 +28,6 @@
     margin-top: 2.5vh;
     margin-right: 9.5vw;
     margin-left: 9.5vw;
-    font-size: 1.2vw; /* Responsive font size based on viewport width */
     font-weight: normal;
     font-family: 'Roboto', sans-serif;
   }
@@ -229,4 +228,89 @@
     .openbtn {
       display: none;
     }
+}
+
+body {
+  color: white;
+}
+
+h3 {
+  margin-top: 20px;
+  color: #FFF;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin: 5px 0;
+}
+
+ul.contestsList > li {
+  margin-bottom: 8px; /* Adjust the value as needed */
+  padding-bottom: 10px; /* Adds some padding at the bottom, optional */
+  padding-top: 10px;
+  border-bottom: 2px solid #ccc;
+  border-top: 2px solid #ccc; /* Optional: adds a light border to visually separate items */
+  background-color: #333;
+}
+
+.party-label {
+  color: white;
+  padding: 2px 6px;
+  border-radius: 5px;
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.democratic {
+  background-color: blue;
+}
+
+.republican {
+  background-color: red;
+}
+
+.non-partisan {
+  background-color: brown;
+}
+
+/* Style for each section container (candidates, locations, referendums) */
+.contestsList, .locationsList, .referendumsList {
+  background-color: #333; /* Light grey background */
+  border-radius: 10px; /* Rounded edges */
+  padding: 20px; /* Padding all around */
+  margin-bottom: 20px; /* Space between each section */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow for depth */
+  list-style-type: none; /* Removes default list styling */
+  padding-left: 20px; /* Removes default list padding */
+}
+
+/* Style for individual items to maintain spacing */
+.contestsList > li, .locationsList > li, .referendumsList > li {
+  margin-bottom: 10px; /* Space between items */
+  padding-bottom: 10px; /* Additional padding at the bottom of each item */
+  border-bottom: 1px solid #ccc; /* Optional: adds a light border to visually separate items */
+}
+
+/* Removes the border from the last item for cleaner look */
+.contestsList > li:last-child, .locationsList > li:last-child, .referendumsList > li:last-child {
+  border-bottom: none;
+}
+
+.section-box {
+  background-color: #333; /* Light grey background */
+  border: 2px solid white; /* White border */
+  border-radius: 10px; /* Rounded edges */
+  padding: 15px; /* Padding all around */
+  margin-bottom: 10px; /* Reduced space between each box */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow for depth */
+}
+
+.locationsList, .referendumsList {
+  padding-left: 0;
+  margin: 0;
+  list-style-type: none; /* Removes default list styling */
 }
