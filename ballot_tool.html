@@ -3,7 +3,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coffeehouse</title>
+  <title>Ballot Information Tool</title>
   <link rel="icon" type="image/jpg" href="Coffeehouse_favicon.png">
   <link rel="stylesheet" href="style.css">
   <script>
@@ -48,8 +48,14 @@
     </div>
 
     <h2 style="margin-top: 50px">Voter Information Tool</h2>
+    <div class="form-instructions">
+        <p>If "no data yet" is showing be sure your address is in this format: </p>
+        <p>[address, street, city, state, zip code]</p>
+            Do not include North, South, East, or West.</p>
+        <p>Example: 1031 6th Ave, Onalaska, Wisconsin, 54650</p>
+    </div>
     <form id="addressForm">
-        <input type="text" id="address" placeholder="Enter your address" required>
+        <input type="text" id="address" placeholder="Enter your address" required>        
         <button type="submit">See my Ballot Information</button>
     </form>
     <div id="results"></div>
@@ -80,7 +86,7 @@
     // Display Election Information
     if (data && data.election) {
         const electionInfo = document.createElement('div');
-        electionInfo.innerHTML = `<h3>Election: ${data.election.name}</h3><p>Date: ${data.election.electionDay}</p>`;
+        electionInfo.innerHTML = `<h3>Election: ${data.election.name}</h3><p style="padding-left: 40px">Date: ${data.election.electionDay}</p>`;
         resultsContainer.appendChild(electionInfo);
     } else {
         displayNoDataMessage('Election Information', resultsContainer);
@@ -156,26 +162,22 @@ function displayReferendums(contests, container) {
     referendumsHeader.textContent = 'Prepare for the questions being asked:';
     container.appendChild(referendumsHeader);
 
-    const referendumsList = document.createElement('ul');
-    referendumsList.className = 'referendumsList'; // Ensures consistent styling
-
     contests.filter(contest => contest.type === 'referendum').forEach(referendum => {
         const referendumBox = document.createElement('div'); // Box for each referendum question
         referendumBox.className = 'section-box'; // Apply box styling
 
+        // Referendum Title
         const title = document.createElement('div');
         title.innerHTML = `<strong>${referendum.referendumTitle}</strong>`;
-        title.style.marginBottom = "10px"; // Spacing below the title
         referendumBox.appendChild(title);
 
+        // Referendum Text
         const text = document.createElement('div');
         text.textContent = referendum.referendumText;
         referendumBox.appendChild(text);
 
-        referendumsList.appendChild(referendumBox);
+        container.appendChild(referendumBox);
     });
-
-    container.appendChild(referendumsList);
 }
 
 function displayLocationData(sectionName, locations, container) {
@@ -184,39 +186,34 @@ function displayLocationData(sectionName, locations, container) {
     container.appendChild(sectionHeader);
 
     if (locations && locations.length > 0) {
-        const locationsList = document.createElement('ul');
-        locationsList.className = 'locationsList'; // Ensures consistent styling
-
         locations.forEach(location => {
             const locationBox = document.createElement('div'); // Box for each location
             locationBox.className = 'section-box'; // Apply box styling
 
+            // Location Name
             const locationName = document.createElement('div');
             locationName.textContent = location.address.locationName;
-            locationName.style.marginBottom = "10px"; // Spacing below the location name
             locationBox.appendChild(locationName);
 
+            // Google Maps search URL
             const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${location.address.line1}, ${location.address.city}, ${location.address.state} ${location.address.zip}`)}`;
 
+            // Location Address as a clickable link
             const locationAddress = document.createElement('a');
             locationAddress.href = mapsSearchUrl;
             locationAddress.target = "_blank";
             locationAddress.textContent = `${location.address.line1}, ${location.address.city}, ${location.address.state} ${location.address.zip}`;
-            locationAddress.style.color = "#AB824E"; // Link color
-            locationAddress.style.display = "block"; // Ensures margin applies correctly
-            locationAddress.style.marginBottom = "10px"; // Spacing below the address
             locationBox.appendChild(locationAddress);
 
+            // Polling Hours
             if (location.pollingHours) {
                 const hours = document.createElement('div');
-                hours.innerHTML = `<strong>Hours:</strong> ${location.pollingHours}`;
+                hours.innerHTML = `<strong>Polling Hours:</strong> ${location.pollingHours}`;
                 locationBox.appendChild(hours);
             }
 
-            locationsList.appendChild(locationBox);
+            container.appendChild(locationBox);
         });
-
-        container.appendChild(locationsList);
     } else {
         displayNoDataMessage(sectionName, container);
     }
@@ -228,5 +225,11 @@ function displayNoDataMessage(sectionName, container) {
     container.appendChild(noDataMessage);
 }
     </script>
+
+    <!-------------------------Footer------------------->
+    <div class="footer" style="margin-top: 60vh; margin-bottom: 0;">
+        <p>&copy; 2023 Coffeehouse. All rights reserved.</p>
+        <p>Contact: info@coffeehouse.vote</p>
+    </div>
 </body>
 </html>
