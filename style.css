@@ -273,7 +273,24 @@ ul.contestsList > li {
   background-color: red;
 }
 
+.libertarian {
+  background-color: rgb(255, 255, 97);
+  color: black
+}
+
+.Wisconsin-Green {
+  background-color: green;
+}
+
+.independent {
+  background-color: rgb(160, 48, 160);
+}
+
 .non-partisan {
+  background-color: #AB824E;
+}
+
+.constitution {
   background-color: #AB824E;
 }
 
